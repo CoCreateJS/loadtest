@@ -8,6 +8,19 @@
   "publishConfig": {
     "access": "restricted"
   },
+  "cocreate": {
+    "environment": [
+      "server"
+    ],
+    "interface": {
+      "schemaVersion": 1,
+      "summary": "A Simple component similar to CoCreate-input & CoCreate-fetch which Save and fetch data for inputs, textarea, selects from localstorage. Easily configured using HTML5 attributes and/or JavaScript API",
+      "status": "Package entrypoint src/index.js is missing in the current checkout; no declarative or API contract could be extracted.",
+      "api": {
+        "exports": []
+      }
+    }
+  },
   "scripts": {},
   "repository": {
     "type": "git",
