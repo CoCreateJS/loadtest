@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>CoCreate Server Load Test</title>
+		<meta
+			name="description"
+			content="A dependency-free Node.js load generator for CoCreate Server clusters, HTTP endpoints, and CoCreate socket workloads."
+		/>
+	</head>
+	<body>
+		<main>
+			<h1>CoCreate Server Load Test</h1>
+			<p>
+				A dependency-free Node.js client for measuring HTTP, HTTPS, file
+				download, and CoCreate socket workloads from a separate load-generator
+				node. The target server remains responsible for its own resource and
+				autoscaling telemetry.
+			</p>
+
+			<h2>Requirements and setup</h2>
+			<p>Use Node.js 22.4 or newer. Clone this repository on a machine separate from the target:</p>
+			<pre><code>npm run setup</code></pre>
+			<p>
+				Setup writes a local <code>cocreate-server-loadtest.config.json</code>
+				with restricted file permissions. No dependency installation is
+				required; the runner uses Node's built-in fetch, WebSocket, and worker
+				threads.
+			</p>
+
+			<h2>HTTP requests</h2>
+			<p>
+				Set <code>LOAD_MODE=http-get</code>, <code>HTTP_URL</code>,
+				<code>RATE</code>, and <code>DURATION_SECONDS</code> to load a health,
+				API, or file endpoint. Response bodies are read so byte counts and
+				transfer latency are included. POST workloads require
+				<code>LOAD_MODE=http-post</code> and explicit
+				<code>ALLOW_HTTP_POST=YES</code>.
+			</p>
+			<pre><code>LOAD_MODE=http-get HTTP_URL=https://api.example.com/health RATE=5 DURATION_SECONDS=30 npm run load</code></pre>
+
+			<h2>CoCreate envelope workloads</h2>
+			<p>
+				Use <code>LOAD_MODE=envelope</code> with an
+				<code>ENVELOPE_JSON</code> or <code>ENVELOPE_FILE</code> payload.
+				Read requests are allowed by default. Other methods require
+				<code>ALLOW_ENVELOPE_WRITES=YES</code>. Set
+				<code>SOCKET_CLIENTS</code> to control concurrent client connections;
+				<code>RATE</code> is the total request start rate across those clients.
+			</p>
+			<p>
+				Use representative bounded reads and disposable data for writes. The
+				client does not create or clean up records automatically.
+			</p>
+
+			<h2>Phases and results</h2>
+			<p>
+				<code>PROFILE_JSON</code> can sequence warmup, baseline, ramp, burst,
+				and cooldown phases. Optional <code>HEALTH_URL</code> and
+				<code>OBSERVATION_URL</code> polling records availability and external
+				JSON snapshots. Set <code>RESULT_FILE</code> for a JSON summary and
+				<code>SAMPLES_FILE</code> for per-request JSONL records.
+			</p>
+			<p>
+				Correlate client timestamps, latency, throughput, errors, and health
+				interruptions with server-side worker, CPU, memory, replica, and
+				autoscaler telemetry. Keep the generator's host and capacity consistent
+				between comparisons and ensure it is not saturated.
+			</p>
+			<p>See the <a href="https://github.com/CoCreateJS/CoCreate-server-loadtest#readme">README</a> for configuration reference and complete examples.</p>
+		</main>
+	</body>
+</html>
