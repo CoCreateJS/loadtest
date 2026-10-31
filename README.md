@@ -1,54 +1,95 @@
-# CoCreate-boilerplate
-A simple boilerplate component in vanilla javascript. Easily configured using HTML5 data-attributes and/or JavaScript API. Take it for a spin in our [playground!](https://cocreate.app/docs/boilerplate)
+# CoCreate Server Load Test
 
-![GitHub file size in bytes](https://img.shields.io/github/size/CoCreate-app/CoCreate-boilerplate/dist/CoCreate-boilerplate.min.js?label=minified%20size&style=for-the-badge) 
-![GitHub latest release](https://img.shields.io/github/v/release/CoCreate-app/CoCreate-boilerplate?style=for-the-badge)
-![GitHub](https://img.shields.io/github/license/CoCreate-app/CoCreate-boilerplate?style=for-the-badge) 
-![GitHub labels](https://img.shields.io/github/labels/CoCreate-app/CoCreate-boilerplate/help%20wanted?style=for-the-badge)
+CoCreate Server Load Test is a dependency-free Node.js load generator for CoCreate Server clusters. Run it on a separate load-generator node to send HTTP/HTTPS requests, download files, and exercise CoCreate socket envelopes while the target environment independently records CPU, memory, worker, replica, and autoscaling telemetry. The client records request rate, latency, response bytes, health interruptions, socket reconnects, and failures for comparison with that server-side telemetry.
 
-![CoCreate](https://cdn.cocreate.app/logo.png)
+The runner uses Node.js built-ins only. It has no npm runtime dependencies, load-testing framework, or external load-test executable.
 
-[CoCreate Docs](https://cocreate.app/docs/boilerplate)
+## Install on the load-generator node
 
+Use Node.js 22.4 or newer. Clone or copy this repository onto a machine separate from the target server:
 
-We want this library to be community-driven, and CoCreate led. We need your help to realize this goal. To help make sure we are building the right things in the right order, we ask that you create [issues](https://github.com/CoCreate-app/Realtime_Admin_CRM_and_CMS/issues) and [pull requests](https://github.com/CoCreate-app/Realtime_Admin_CRM_and_CMS/pulls) or merely upvote or comment on existing issues or pull requests.
+```sh
+npm run setup
+```
 
-We appreciate your continued support, thank you!
+Setup writes `cocreate-server-loadtest.config.json` with mode `0600`; that file is ignored by Git. The runner uses Node's built-in `fetch`, `WebSocket`, and worker threads. No `npm install` step is required.
 
-# Table of Contents
+## Configure the target
 
-- [Table of Contents](#table-of-contents)
-- [Announcements](#announcements)
-- [Roadmap](#roadmap)
-- [How to Contribute](#how-to-contribute)
-- [About](#about)
-- [License](#license)
+Run `npm run setup` on the load-generator node and provide the CoCreate host, organization ID, and optional API key. The config uses the same `host`, `organization_id`, and `apikey` fields as CoCreate clients. `HOST`, `ORGANIZATION_ID`, and `API_KEY` can override local config for a run. Keep credentials on the load-generator node and out of result artifacts.
 
-<a name="announcements"></a>
-# Announcements
+The host should be the externally reachable service hostname, for example `https://api.example.com`. The runner uses `wss` for remote hosts and puts the organization ID in the socket path.
 
-All updates to this library are documented in our [CHANGELOG](https://github.com/CoCreate-app/CoCreate-boilerplate/blob/master/CHANGELOG.md) and [releases](https://github.com/CoCreate-app/CoCreate-boilerplate/releases). You may also subscribe to email for releases and breaking changes. 
+## HTTP and file downloads
 
-<a name="roadmap"></a>
-# Roadmap
+Use GET to exercise health, API, or file endpoints. The full response body is read so downloaded bytes and transfer latency are represented.
 
-If you are interested in the future direction of this project, please take a look at our open [issues](https://github.com/CoCreate-app/CoCreate-boilerplate/issues) and [pull requests](https://github.com/CoCreate-app/CoCreate-boilerplate/pulls). We would love to hear your feedback.
+```sh
+LOAD_MODE=http-get \
+HTTP_URL=https://api.example.com/health \
+RATE=5 DURATION_SECONDS=30 \
+RESULT_FILE=results/health.json SAMPLES_FILE=results/health.jsonl \
+npm run load
+```
 
+`RATE` is the total request start rate per second. HTTP POST is available for controlled test endpoints; it is blocked unless explicitly enabled:
 
-<a name="about"></a>
-# About
+```sh
+LOAD_MODE=http-post \
+HTTP_URL=https://api.example.com/test/echo \
+ALLOW_HTTP_POST=YES \
+BODY_JSON='{"source":"load-test","id":"{{UUID}}"}' \
+RATE=2 DURATION_SECONDS=15 \
+npm run load
+```
 
-CoCreate-boilerplate is guided and supported by the CoCreate Developer Experience Team.
+`HEADERS_JSON` supplies JSON headers, `REQUEST_TIMEOUT_MS` sets the request timeout, `RESULT_FILE` saves the summary, and `SAMPLES_FILE` saves one JSONL record per request. Use disposable test data for write requests.
 
-Please Email the Developer Experience Team [here](mailto:develop@cocreate.app) in case of any queries.
+## CoCreate envelope and socket workload
 
-CoCreate-boilerplate is maintained and funded by CoCreate. The names and logos for CoCreate are trademarks of CoCreate, LLC.
+Provide a representative CoCreate envelope in `ENVELOPE_JSON` or `ENVELOPE_FILE`. Read operations are allowed by default; other methods require `ALLOW_ENVELOPE_WRITES=YES` because they may modify stored data.
 
-<a name="contribute"></a>
-# How to Contribute
+```sh
+LOAD_MODE=envelope \
+ENVELOPE_JSON='{"method":"object.read","array":"load-test","filter":{"query":{"status":"active"}}}' \
+SOCKET_CLIENTS=4 RATE=20 DURATION_SECONDS=60 \
+SERVER_SIZE=small SERVER_WORKERS=2 TEST_ENVIRONMENT=staging \
+RESULT_FILE=results/read-small-2-workers.json \
+npm run load
+```
 
-We encourage contribution to our libraries (you might even score some nifty swag), please see our [CONTRIBUTING](https://github.com/CoCreate-app/CoCreate-boilerplate/blob/master/CONTRIBUTING.md) guide for details.
+Each `SOCKET_CLIENTS` worker thread opens its own WebSocket connection and client ID. It sends CoCreate envelopes with the organization, socket, frame, UUID, timestamp, and optional API key fields. `RATE` is the total request rate across those clients; the runner distributes requests among them. `REQUEST_TIMEOUT_MS` bounds response waits. After a disconnect, a client retries with exponential backoff starting at `RECONNECT_DELAY_MS` (default 1 second) up to `MAX_RECONNECT_DELAY_MS` (default 10 seconds). Disconnect and reconnect timestamps are included in the result. The runner implements the small load-test transport directly so it does not pull the browser CRUD package into the generator.
 
-# License
-[The MIT License (MIT)](https://github.com/CoCreate-app/CoCreate-boilerplate/blob/master/LICENSE)
+Choose a query that returns a predictable, bounded amount of data. Avoid write tests against production or shared user data. The runner does not create test records or clean them up automatically.
+
+## Scale and recovery profiles
+
+`PROFILE_JSON` runs named phases in order. Each phase has a duration and total request rate. This allows a single run to apply a ramp, hold, burst, and cooldown profile:
+
+```sh
+PROFILE_JSON='[
+  {"name":"warmup","duration":"30s","rate":1},
+  {"name":"baseline","duration":"2m","rate":10},
+  {"name":"scale-out","duration":"5m","rate":50},
+  {"name":"cooldown","duration":"5m","rate":1}
+]' \
+HEALTH_URL=https://api.example.com/health \
+OBSERVATION_URL=https://monitor.example.com/cocreate/summary \
+MONITOR_INTERVAL_MS=5000 \
+LOAD_MODE=envelope ENVELOPE_FILE=profiles/representative-read.json \
+SOCKET_CLIENTS=8 RESULT_FILE=results/scale-cycle.json \
+npm run load
+```
+
+`HEALTH_URL` is polled during the run to record availability and response time. `OBSERVATION_URL` is polled for JSON snapshots; its response is stored without assuming a specific cloud provider's scaling schema. These monitor requests are a small additional load and should be accounted for in interpretation. The load client records when phases ran; correlate timestamps with your independent server and autoscaler telemetry to determine scale-up delay, recovery time, scale-down timing, and interruptions.
+
+## Reading results
+
+The summary includes target and workload settings, generator host details, total and per-phase counts, achieved request rate, latency percentiles, response bytes, errors, health checks, and observation snapshots. Set `SAMPLES_FILE` to save per-request JSONL records for spreadsheet or analysis tools. Run the generator on a separate machine, keep its location and capacity consistent between comparisons, and check that it is not CPU or network saturated.
+
+The command exits with status `1` if requests fail, a phase misses planned starts, or a health poll fails. The result files are written before that exit status is set, so failed runs still produce measurements.
+
+For a minimum viable node-size baseline, compare the same workload and test location across candidate sizes. Include steady load, a controlled ramp, a burst, and cooldown. Correlate client-side results with server telemetry such as actual worker count, CPU quota, memory, event-loop delay, replicas, and database/socket/mesh metrics. Increase load in steps and stop if the target becomes unstable; capacity is the highest profile that meets the chosen latency, error, and availability criteria with headroom.
+
+The test client records request and health failures, but it does not determine why a failure occurred or control cluster scaling. Your infrastructure telemetry remains the source for replica counts, resource usage, and scaling events.
 

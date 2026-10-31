@@ -1,40 +1,58 @@
 {
-  "name": "@cocreate/loadtest",
+  "name": "@cocreate/server-loadtest",
   "version": "1.3.0",
-  "description": "A Simple component similar to CoCreate-input & CoCreate-fetch which Save and fetch data for inputs, textarea, selects from localstorage. Easily configured using HTML5 attributes and/or JavaScript API",
+  "description": "Dependency-free Node.js load generator for CoCreate Server clusters, HTTP/HTTPS endpoints, and CoCreate socket envelopes.",
+  "type": "module",
   "keywords": [
-    "loadtest"
+    "cocreate-server",
+    "server-loadtest",
+    "load-testing",
+    "loadtest",
+    "performance-testing",
+    "benchmark",
+    "cluster",
+    "autoscaling",
+    "http",
+    "https",
+    "websocket"
   ],
   "publishConfig": {
     "access": "restricted"
   },
   "cocreate": {
-    "environment": [
-      "server"
-    ],
+    "environment": ["tooling"],
     "interface": {
       "schemaVersion": 1,
-      "summary": "A Simple component similar to CoCreate-input & CoCreate-fetch which Save and fetch data for inputs, textarea, selects from localstorage. Easily configured using HTML5 attributes and/or JavaScript API",
-      "status": "Package entrypoint src/index.js is missing in the current checkout; no declarative or API contract could be extracted.",
+      "summary": "Dependency-free Node.js load generator for CoCreate Server clusters, socket envelopes, and HTTP endpoints.",
+      "status": "Run from a separate load-generator node to measure HTTP, HTTPS, and CoCreate socket workloads.",
       "api": {
         "exports": []
       }
     }
   },
-  "scripts": {},
+  "scripts": {
+    "setup": "node src/setup.js",
+    "load": "node src/runner.js",
+    "load:http": "LOAD_MODE=http-get node src/runner.js",
+    "load:post": "LOAD_MODE=http-post node src/runner.js",
+    "load:envelope": "LOAD_MODE=envelope node src/runner.js",
+    "load:version": "node --version"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CoCreate-app/CoCreate-loadtest.git"
+    "url": "git+https://github.com/CoCreateJS/CoCreate-server-loadtest.git"
   },
   "author": "CoCreate LLC",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/CoCreate-app/CoCreate-loadtest/issues"
+    "url": "https://github.com/CoCreateJS/CoCreate-server-loadtest/issues"
   },
-  "homepage": "https://cocreate.app/docs/loadtest",
+  "homepage": "https://cocreate.app/docs/server-loadtest",
   "funding": {
     "type": "GitHub Sponsors ❤",
     "url": "https://github.com/sponsors/CoCreate-app"
   },
-  "main": "./src/index.js"
+  "engines": {
+    "node": ">=22.4"
+  }
 }
