@@ -396,3 +396,10 @@ main().catch((error) => {
 	console.error(`Load test failed: ${error.message}`);
 	process.exitCode = 1;
 });
+
+/**
+ * Dependency-free Node.js load generator for CoCreate Server clusters, socket envelopes, and HTTP endpoints.
+ *
+ * @module server-loadtest
+ * @environment tooling
+ */

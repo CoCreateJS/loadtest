@@ -19,17 +19,6 @@
   "publishConfig": {
     "access": "restricted"
   },
-  "cocreate": {
-    "environment": ["tooling"],
-    "interface": {
-      "schemaVersion": 1,
-      "summary": "Dependency-free Node.js load generator for CoCreate Server clusters, socket envelopes, and HTTP endpoints.",
-      "status": "Run from a separate load-generator node to measure HTTP, HTTPS, and CoCreate socket workloads.",
-      "api": {
-        "exports": []
-      }
-    }
-  },
   "scripts": {
     "setup": "node src/setup.js",
     "load": "node src/runner.js",
