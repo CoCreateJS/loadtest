@@ -17,7 +17,7 @@
     "websocket"
   ],
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "scripts": {
     "setup": "node src/setup.js",
