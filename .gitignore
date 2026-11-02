@@ -2,7 +2,7 @@
 # 1. Core Dependency Folders
 # ==============================================================================
 node_modules
-cocreate-server-loadtest.config.json
+cocreate-loadtest.config.json
 jspm_packages/
 .pnp/
 .pnp.*

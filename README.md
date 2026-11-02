@@ -12,7 +12,7 @@ Use Node.js 22.4 or newer. Clone or copy this repository onto a machine separate
 npm run setup
 ```
 
-Setup writes `cocreate-server-loadtest.config.json` with mode `0600`; that file is ignored by Git. The runner uses Node's built-in `fetch`, `WebSocket`, and worker threads. No `npm install` step is required.
+Setup writes `cocreate-loadtest.config.json` with mode `0600`; that file is ignored by Git. The runner uses Node's built-in `fetch`, `WebSocket`, and worker threads. No `npm install` step is required.
 
 ## Configure the target
 

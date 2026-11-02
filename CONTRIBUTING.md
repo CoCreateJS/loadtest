@@ -1,6 +1,6 @@
 # Contributing to CoCreate Server Load Test
 
-Issues and pull requests are welcome in the [CoCreate Server Load Test repository](https://github.com/CoCreateJS/CoCreate-server-loadtest).
+Issues and pull requests are welcome in the [CoCreate Server Load Test repository](https://github.com/CoCreateJS/loadtest).
 
 ## Development
 

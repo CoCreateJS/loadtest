@@ -133,7 +133,7 @@ function summarize(samples) {
 }
 
 async function loadConfiguration() {
-	const configPath = path.resolve(process.env.COCREATE_CONFIG || "cocreate-server-loadtest.config.json");
+	const configPath = path.resolve(process.env.COCREATE_CONFIG || "cocreate-loadtest.config.json");
 	let stored = {};
 	try { stored = JSON.parse(await fs.readFile(configPath, "utf8")); }
 	catch (error) { if (error.code !== "ENOENT") throw new Error(`Cannot read ${configPath}: ${error.message}`); }
@@ -400,6 +400,6 @@ main().catch((error) => {
 /**
  * Dependency-free Node.js load generator for CoCreate Server clusters, socket envelopes, and HTTP endpoints.
  *
- * @module server-loadtest
+ * @module loadtest
  * @environment tooling
  */

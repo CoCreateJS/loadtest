@@ -1,11 +1,11 @@
 {
-  "name": "@cocreate/server-loadtest",
+  "name": "@cocreate/loadtest",
   "version": "1.3.0",
   "description": "Dependency-free Node.js load generator for CoCreate Server clusters, HTTP/HTTPS endpoints, and CoCreate socket envelopes.",
   "type": "module",
   "keywords": [
     "cocreate-server",
-    "server-loadtest",
+    "loadtest",
     "load-testing",
     "loadtest",
     "performance-testing",
@@ -29,17 +29,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CoCreateJS/CoCreate-server-loadtest.git"
+    "url": "git+https://github.com/CoCreateJS/loadtest.git"
   },
   "author": "CoCreate LLC",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/CoCreateJS/CoCreate-server-loadtest/issues"
+    "url": "https://github.com/CoCreateJS/loadtest/issues"
   },
-  "homepage": "https://CoCreateJS.com/docs/server-loadtest",
+  "homepage": "https://CoCreateJS.com/docs/loadtest",
   "funding": {
     "type": "GitHub Sponsors ❤",
-    "url": "https://github.com/sponsors/CoCreate-app"
+    "url": "https://github.com/sponsors/CoCreateJS"
   },
   "engines": {
     "node": ">=22.4"

@@ -3,7 +3,7 @@ import path from "node:path";
 import readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 
-const file = path.resolve(process.env.COCREATE_CONFIG || "cocreate-server-loadtest.config.json");
+const file = path.resolve(process.env.COCREATE_CONFIG || "cocreate-loadtest.config.json");
 let existing = {};
 try { existing = JSON.parse(await fs.readFile(file, "utf8")); }
 catch (error) { if (error.code !== "ENOENT") throw error; }
