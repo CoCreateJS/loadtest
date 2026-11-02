@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/CoCreateJS/loadtest/compare/v1.0.0...v2.0.0) (2026-11-02)
+
+
+### chore
+
+* record package identity migration as breaking ([1a0a404](https://github.com/CoCreateJS/loadtest/commit/1a0a404e05dbb47165ccf6047ab2031dea7a078a))
+
+
+### BREAKING CHANGES
+
+* Consumers must install @cocreate/loadtest and use the CoCreateJS repository identity; previous package and repository identities are no longer supported.
+
 # 1.0.0 (2026-11-02)
 
 
